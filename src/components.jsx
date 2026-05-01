@@ -2,6 +2,17 @@
 
 const { useState, useEffect, useRef, useCallback } = React;
 
+// ── useMobile hook ───────────────────────────────────────────────
+function useMobile() {
+  const [w, setW] = useState(window.innerWidth);
+  useEffect(() => {
+    const h = () => setW(window.innerWidth);
+    window.addEventListener('resize', h);
+    return () => window.removeEventListener('resize', h);
+  }, []);
+  return { isMobile: w < 768, isTablet: w < 1024 };
+}
+
 // ── Icons ────────────────────────────────────────────────────────
 const Icon = {
   ArrowRight: (p) => <svg width={p.size||16} height={p.size||16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={p.style}><path d="M5 12h14M12 5l7 7-7 7"/></svg>,
@@ -37,83 +48,134 @@ const Icon = {
 function Navbar({ currentPage, onNavigate }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { isMobile } = useMobile();
+
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 30);
     window.addEventListener('scroll', h);
     return () => window.removeEventListener('scroll', h);
   }, []);
 
-  const links = ['home','projects','about','contact'];
+  // Close mobile menu on page change
+  useEffect(() => { setMobileOpen(false); }, [currentPage]);
+
+  const links = ['home', 'projects', 'about', 'contact'];
+  const nav = (page) => { onNavigate(page); setMobileOpen(false); };
 
   return (
     <nav style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
       height: 64,
-      background: scrolled ? 'rgba(8,8,8,0.9)' : 'transparent',
-      backdropFilter: scrolled ? 'blur(20px)' : 'none',
+      background: scrolled || mobileOpen ? 'rgba(8,8,8,0.97)' : 'transparent',
+      backdropFilter: scrolled || mobileOpen ? 'blur(20px)' : 'none',
       borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
-      transition: 'all 0.4s ease',
+      transition: 'background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease',
     }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 20px' : '0 32px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Logo */}
-        <div onClick={() => onNavigate('home')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}>
+        <div onClick={() => nav('home')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}>
           <span className="syne" style={{ fontSize: 20, fontWeight: 800, color: '#f2f0eb', letterSpacing: '-0.04em' }}>Younes</span>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'linear-gradient(135deg,#10b981,#f59e0b)', marginLeft: 3, marginBottom: 12, display: 'inline-block' }} />
         </div>
 
         {/* Desktop nav */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          {links.map(l => (
-            <span key={l} onClick={() => onNavigate(l)} style={{
-              padding: '7px 16px', borderRadius: 8, fontSize: 13.5, fontWeight: 500,
-              cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.2s',
-              color: currentPage === l ? '#f2f0eb' : 'rgba(242,240,235,0.4)',
-              background: currentPage === l ? 'rgba(255,255,255,0.07)' : 'transparent',
-              letterSpacing: '0.01em',
+        {!isMobile && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            {links.map(l => (
+              <span key={l} onClick={() => nav(l)} style={{
+                padding: '7px 16px', borderRadius: 8, fontSize: 13.5, fontWeight: 500,
+                cursor: 'pointer', textTransform: 'capitalize', transition: 'all 0.2s',
+                color: currentPage === l ? '#f2f0eb' : 'rgba(242,240,235,0.4)',
+                background: currentPage === l ? 'rgba(255,255,255,0.07)' : 'transparent',
+                letterSpacing: '0.01em',
+              }}
+                onMouseEnter={e => { if (currentPage !== l) e.currentTarget.style.color = 'rgba(242,240,235,0.75)'; }}
+                onMouseLeave={e => { if (currentPage !== l) e.currentTarget.style.color = 'rgba(242,240,235,0.4)'; }}>
+                {l}
+              </span>
+            ))}
+            <div onClick={() => nav('contact')} style={{
+              marginLeft: 8, padding: '8px 20px', borderRadius: 8, cursor: 'pointer',
+              background: 'linear-gradient(135deg, #10b981, #f59e0b)',
+              fontSize: 13.5, fontWeight: 700, color: '#080808',
+              letterSpacing: '0.01em', transition: 'all 0.2s',
+              boxShadow: '0 4px 20px rgba(16,185,129,0.3)',
             }}
-              onMouseEnter={e => { if (currentPage !== l) e.currentTarget.style.color = 'rgba(242,240,235,0.75)'; }}
-              onMouseLeave={e => { if (currentPage !== l) e.currentTarget.style.color = 'rgba(242,240,235,0.4)'; }}>
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(16,185,129,0.4)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(16,185,129,0.3)'; }}>
+              Hire Me
+            </div>
+          </div>
+        )}
+
+        {/* Mobile hamburger */}
+        {isMobile && (
+          <button onClick={() => setMobileOpen(!mobileOpen)} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: '#f2f0eb', padding: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {mobileOpen ? <Icon.X size={22} /> : <Icon.Menu size={22} />}
+          </button>
+        )}
+      </div>
+
+      {/* Mobile full-screen menu */}
+      {isMobile && mobileOpen && (
+        <div style={{
+          position: 'fixed', top: 64, left: 0, right: 0, bottom: 0,
+          background: 'rgba(8,8,8,0.98)', backdropFilter: 'blur(24px)',
+          zIndex: 99, display: 'flex', flexDirection: 'column', padding: '32px 24px',
+          animation: 'fadeIn 0.2s ease',
+        }}>
+          {links.map(l => (
+            <div key={l} onClick={() => nav(l)} style={{
+              padding: '20px 4px', fontSize: 32, fontWeight: 800,
+              color: currentPage === l ? '#10b981' : 'rgba(242,240,235,0.8)',
+              cursor: 'pointer', textTransform: 'capitalize',
+              fontFamily: 'Syne, sans-serif', letterSpacing: '-0.03em',
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              transition: 'color 0.2s',
+            }}>
               {l}
-            </span>
+            </div>
           ))}
-          <div onClick={() => onNavigate('contact')} style={{
-            marginLeft: 8, padding: '8px 20px', borderRadius: 8, cursor: 'pointer',
+          <div onClick={() => nav('contact')} style={{
+            marginTop: 32, padding: '18px', borderRadius: 14,
             background: 'linear-gradient(135deg, #10b981, #f59e0b)',
-            fontSize: 13.5, fontWeight: 700, color: '#080808',
-            letterSpacing: '0.01em', transition: 'all 0.2s',
-            boxShadow: '0 4px 20px rgba(16,185,129,0.3)',
-          }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(16,185,129,0.4)'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(16,185,129,0.3)'; }}>
+            fontSize: 18, fontWeight: 700, color: '#080808',
+            textAlign: 'center', cursor: 'pointer',
+            boxShadow: '0 8px 32px rgba(16,185,129,0.35)',
+          }}>
             Hire Me
           </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 }
 
 // ── Footer ────────────────────────────────────────────────────────
 function Footer({ onNavigate }) {
+  const { isMobile } = useMobile();
   return (
-    <footer style={{ background: '#050505', borderTop: '1px solid rgba(255,255,255,0.06)', padding: '56px 32px 32px' }}>
+    <footer style={{ background: '#050505', borderTop: '1px solid rgba(255,255,255,0.06)', padding: isMobile ? '40px 20px 28px' : '56px 32px 32px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 40, flexWrap: 'wrap', marginBottom: 48 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 32, flexWrap: 'wrap', marginBottom: 40 }}>
           <div>
             <div className="syne" style={{ fontSize: 22, fontWeight: 800, marginBottom: 10, letterSpacing: '-0.03em' }}>
               Younes<span style={{ width: 6, height: 6, borderRadius: '50%', background: 'linear-gradient(135deg,#10b981,#f59e0b)', display: 'inline-block', marginLeft: 3, marginBottom: 4 }} />
             </div>
             <p style={{ fontSize: 13.5, color: 'rgba(242,240,235,0.35)', maxWidth: 220, lineHeight: 1.7 }}>AI & Data Analytics professional building data-driven solutions.</p>
           </div>
-          <div style={{ display: 'flex', gap: 60 }}>
+          <div style={{ display: 'flex', gap: isMobile ? 40 : 60 }}>
             {[
-              { title: 'Navigate', items: [['Home','home'],['Projects','projects'],['About','about'],['Contact','contact']] },
-              { title: 'Connect', items: [['GitHub','https://github.com/YounesSoul'],['LinkedIn','https://linkedin.com/in/younes-soulaiman-201b9a241/'],['Email','mailto:topmind.youness@gmail.com']] },
+              { title: 'Navigate', items: [['Home', 'home'], ['Projects', 'projects'], ['About', 'about'], ['Contact', 'contact']] },
+              { title: 'Connect', items: [['GitHub', 'https://github.com/YounesSoul'], ['LinkedIn', 'https://linkedin.com/in/younes-soulaiman-201b9a241/'], ['Email', 'mailto:topmind.youness@gmail.com']] },
             ].map(col => (
               <div key={col.title}>
                 <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(242,240,235,0.25)', marginBottom: 16 }}>{col.title}</div>
                 {col.items.map(([label, href]) => (
-                  <div key={label} onClick={() => href.startsWith('http') || href.startsWith('mailto') ? window.open(href,'_blank') : onNavigate(href)}
+                  <div key={label} onClick={() => href.startsWith('http') || href.startsWith('mailto') ? window.open(href, '_blank') : onNavigate(href)}
                     style={{ fontSize: 13.5, color: 'rgba(242,240,235,0.4)', marginBottom: 10, cursor: 'pointer', transition: 'color 0.2s' }}
                     onMouseEnter={e => e.currentTarget.style.color = '#10b981'}
                     onMouseLeave={e => e.currentTarget.style.color = 'rgba(242,240,235,0.4)'}>
@@ -126,7 +188,7 @@ function Footer({ onNavigate }) {
         </div>
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
           <span style={{ fontSize: 12, color: 'rgba(242,240,235,0.2)' }}>© 2026 Younes Soulaiman</span>
-          <span style={{ fontSize: 12, color: 'rgba(242,240,235,0.2)' }}>Built with Next.js · Tailwind CSS</span>
+          <span style={{ fontSize: 12, color: 'rgba(242,240,235,0.2)' }}>Built with React · Hosted on Vercel</span>
         </div>
       </div>
     </footer>
@@ -229,4 +291,4 @@ function Tag({ children }) {
   );
 }
 
-Object.assign(window, { Navbar, Footer, AnimateIn, CountUp, Lightbox, GradBtn, Tag, Icon });
+Object.assign(window, { useMobile, Navbar, Footer, AnimateIn, CountUp, Lightbox, GradBtn, Tag, Icon });
