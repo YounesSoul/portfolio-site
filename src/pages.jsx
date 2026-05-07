@@ -197,6 +197,7 @@ function HeroSection({ onNavigate }) {
 function FeaturedSection({ onNavigate }) {
   const { isMobile } = useMobile();
   const projects = [
+    { id: 'fraud-detection-system', title: 'Real-Time Fraud Detection System', cat: 'AI / ML Systems', desc: 'Production-style fraud detection combining a Random Forest model, FastAPI backend, live transaction streaming, and a React analyst dashboard — achieving 98.1% fraud recall at only ~28ms response time.', tools: ['Python', 'FastAPI', 'React', 'Docker'], metric: '98.1%', metricLabel: 'Fraud Recall', img: null, color: '#ef4444', flagship: true },
     { id: 'retail-performance-dashboard', title: 'Retail Performance Dashboard', cat: 'Business Intelligence', desc: 'Analyzed $1.57M in retail revenue using SQL + Power BI — uncovering critical margin gaps between categories with 19% Technology vs 2% Furniture profitability.', tools: ['SQL', 'Power BI', 'SQLite'], metric: '$1.57M', metricLabel: 'Revenue Analyzed', img: 'assets/images/retail-dashboard-v2.png', color: '#f59e0b' },
     { id: 'predicting-customer-returns', title: 'Predicting Customer Returns', cat: 'Machine Learning', desc: 'End-to-end imbalanced ML pipeline detecting 79% of return cases by optimizing Random Forest thresholds via F2-score — enabling proactive business intervention.', tools: ['Python', 'Scikit-Learn', 'Pandas'], metric: '78.95%', metricLabel: 'Recall Achieved', img: 'assets/images/feature-importance.png', color: '#10b981' },
     { id: 'vehicle-damage-detection', title: 'Vehicle Damage Detection', cat: 'Computer Vision', desc: 'MobileNetV2 transfer learning achieving 93% F1 after business-driven threshold optimization — with Grad-CAM explainability trusted by insurance stakeholders.', tools: ['TensorFlow', 'Keras', 'Grad-CAM'], metric: '93%', metricLabel: 'Damage F1', img: 'assets/images/gradcam-examples.png', color: '#8b5cf6' }
@@ -210,7 +211,7 @@ function FeaturedSection({ onNavigate }) {
             <div>
               <div className="sect-label" style={{ marginBottom: 16 }}>Selected Work</div>
               <h2 className="syne" style={{ fontSize: 'clamp(28px,5vw,52px)', fontWeight: 800, letterSpacing: '-0.04em', color: '#f2f0eb', lineHeight: 1.1 }}>
-                Three projects.<br /><span style={{ color: 'rgba(242,240,235,0.3)' }}>Real impact.</span>
+                Four projects.<br /><span style={{ color: 'rgba(242,240,235,0.3)' }}>Real impact.</span>
               </h2>
             </div>
             <GradBtn outline onClick={() => onNavigate('projects')} size="sm">
@@ -414,6 +415,7 @@ function HomePage({ onNavigate }) {
 function ProjectsPage({ onNavigate }) {
   const { isMobile, isTablet } = useMobile();
   const projects = [
+    { id: 'fraud-detection-system', title: 'Real-Time Fraud Detection System', cat: 'AI / ML Systems', desc: 'Production-style fraud detection combining ML model training, threshold optimization, FastAPI deployment, live transaction streaming, and a React analyst dashboard called SENTRY.', tools: ['Python', 'scikit-learn', 'FastAPI', 'React', 'Docker'], metric: '98.1%', metricLabel: 'Fraud Recall', img: null, color: '#ef4444', flagship: true, results: ['98.1% fraud recall', '4 missed frauds out of 211', '$18,384 simulated fraud blocked'] },
     { id: 'retail-performance-dashboard', title: 'Retail Performance Dashboard', cat: 'Business Intelligence', desc: 'Analyzed $1.57M in retail revenue across 3K orders using SQL and Power BI — uncovering Technology\'s 19% profit margin dominance versus Furniture\'s critical 2% margin risk.', tools: ['SQL', 'SQLite', 'Power BI'], metric: '$1.57M', metricLabel: 'Revenue Analyzed', img: 'assets/images/retail-dashboard-v2.png', color: '#f59e0b', results: ['$175K profit tracked', '19% tech margin', 'Q4 seasonality revealed'] },
     { id: 'predicting-customer-returns', title: 'Predicting Customer Returns', cat: 'Machine Learning', desc: 'End-to-end imbalanced classification pipeline — detecting 79% of return cases via F2-optimized Random Forest thresholds instead of naive accuracy metrics.', tools: ['Python', 'Scikit-Learn', 'Pandas', 'Matplotlib'], metric: '78.95%', metricLabel: 'Recall Achieved', img: 'assets/images/feature-importance.png', color: '#10b981', results: ['78.95% recall', 'F2 threshold optimization', 'PR-AUC: 25.48%'] },
     { id: 'vehicle-damage-detection', title: 'Vehicle Damage Detection', cat: 'Computer Vision', desc: 'MobileNetV2 transfer learning for insurance damage triage — 93% F1 after business-driven threshold calibration with Grad-CAM explainability for stakeholder trust.', tools: ['Python', 'TensorFlow', 'Keras', 'Grad-CAM'], metric: '93%', metricLabel: 'Damage F1', img: 'assets/images/gradcam-examples.png', color: '#8b5cf6', results: ['93% F1 score', '70%+ fewer missed damages', 'Grad-CAM validated'] }
@@ -466,10 +468,19 @@ function ProjectCard({ project: p, onNavigate }) {
         display: 'flex', flexDirection: 'column'
       }}>
       <div style={{ height: 220, overflow: 'hidden', position: 'relative', background: '#0a0a0a' }}>
-        <img src={p.img} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', transition: 'transform 0.6s ease', transform: hov ? 'scale(1.07)' : 'scale(1)', filter: 'brightness(0.8)' }} />
+        {p.img
+          ? <img src={p.img} alt={p.title} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', transition: 'transform 0.6s ease', transform: hov ? 'scale(1.07)' : 'scale(1)', filter: 'brightness(0.8)' }} />
+          : <div style={{ width: '100%', height: '100%', background: `linear-gradient(135deg, ${p.color}18 0%, #0a0a0a 60%)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ textAlign: 'center', opacity: 0.4 }}>
+                <div className="syne" style={{ fontSize: 48, fontWeight: 900, color: p.color, letterSpacing: '-0.05em', lineHeight: 1 }}>{p.metric}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: p.color, letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 6 }}>{p.metricLabel}</div>
+              </div>
+            </div>
+        }
         <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(to bottom, transparent 40%, #111 100%)` }} />
-        <div style={{ position: 'absolute', top: 14, left: 14 }}>
+        <div style={{ position: 'absolute', top: 14, left: 14, display: 'flex', gap: 6, alignItems: 'center' }}>
           <span style={{ padding: '4px 12px', borderRadius: 99, fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', background: '#080808cc', color: p.color, border: `1px solid ${p.color}40`, backdropFilter: 'blur(8px)' }}>{p.cat}</span>
+          {p.flagship && <span style={{ padding: '4px 10px', borderRadius: 99, fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', background: p.color, color: '#080808', backdropFilter: 'blur(8px)' }}>Flagship</span>}
         </div>
         <div style={{ position: 'absolute', bottom: 16, right: 16, textAlign: 'right' }}>
           <div className="syne" style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', color: p.color, lineHeight: 1 }}>{p.metric}</div>
@@ -502,6 +513,52 @@ function ProjectCard({ project: p, onNavigate }) {
 // ══════════════════════════════════════════════════════════════
 
 const projectData = {
+  'fraud-detection-system': {
+    title: 'Real-Time Fraud Detection System', category: 'AI / ML Systems',
+    description: 'A production-style fraud detection system that transforms a machine learning model into an operational decision-support tool — combining model training, threshold optimization, FastAPI deployment, live transaction streaming, and a React analyst dashboard.',
+    tools: ['Python', 'scikit-learn', 'pandas', 'numpy', 'FastAPI', 'Pydantic', 'React', 'Docker', 'Docker Compose', 'joblib'],
+    image: null,
+    color: '#ef4444',
+    flagship: true,
+    githubLink: 'https://github.com/YounesSoul/fraud-detection-system',
+    demoVideoLink: null,
+    kpis: [
+      { label: 'Fraud Recall', value: '98.1%' },
+      { label: 'Precision', value: '91.6%' },
+      { label: 'Threshold', value: '0.14' },
+      { label: 'Avg Response', value: '~28ms' },
+      { label: 'Fraud Blocked', value: '$18,384' }
+    ],
+    businessProblem: 'Credit card fraud is rare but expensive. In highly imbalanced financial datasets, accuracy is misleading — a model that flags every transaction as normal can still appear 99%+ accurate. This project targets the metrics that actually matter in fraud operations: Recall, F2-score, PR-AUC, and false negatives. Missing a fraud case is far more costly than investigating a false alert, so the entire pipeline is optimized around catching fraud, not maximizing overall accuracy.',
+    overview: 'This project is a production-style fraud detection system designed to identify suspicious credit card transactions in real time. Unlike a notebook-only machine learning project, it includes the complete operational pipeline: data preprocessing, model training, threshold optimization, API deployment, streaming simulation, and a live analyst dashboard. The system processes over 129,000 simulated transactions, detects 207 out of 211 actual fraud cases, blocks $18,384 in simulated fraud, and serves predictions at ~28ms average response time.',
+    methodology: 'The system compares Logistic Regression and Random Forest using fraud-focused metrics — Recall, F2-score, PR-AUC, false positives, and false negatives. Logistic Regression achieved high recall but generated too many false positives, risking analyst alert fatigue. Random Forest was selected for its superior operational balance. Rather than using the default 0.50 threshold, the system performs a sweep from 0.05 to 0.95 and selects the optimal threshold at 0.14 based on F2-score, which weights recall twice as heavily as precision.',
+    architecture: 'creditcard.csv → Data Preprocessing → Model Training (LR vs RF comparison) → Threshold Optimization (F2 sweep) → FastAPI Prediction Service → Live Transaction Simulator → SENTRY React Dashboard. The FastAPI backend exposes prediction endpoints that accept transaction features and return fraud probability, binary prediction, and model confidence. A Python streaming simulator continuously sends transactions to the API and logs results, simulating a real-time fraud monitoring workflow. All services are containerized with Docker Compose.',
+    dashboardFeatures: [
+      'Live Feed — real-time transaction stream with fraud alerts highlighted',
+      'Cases — analyst case queue for reviewing flagged transactions',
+      'Investigator — deep-dive view for individual transaction analysis',
+      'Model — live model performance metrics (recall, precision, F1)',
+      'Threshold — interactive threshold analysis and F2-score tradeoffs',
+      'Network — transaction network and pattern visualization',
+      'Rules — rule-based fraud signals and override management'
+    ],
+    results: [
+      '98.1% fraud recall — only 4 missed fraud cases out of 211 actual fraud transactions',
+      '91.6% precision — keeping false alerts manageable for analysts',
+      'Optimized threshold of 0.14 (vs naive 0.50) drove a 16%+ improvement in operational F2-score',
+      '~28ms average API response time for real-time transaction scoring',
+      '$18,384 in simulated fraud blocked across 129,209 streamed transactions',
+      'Random Forest significantly outperformed Logistic Regression on PR-AUC',
+      'Full Docker Compose deployment — API, simulator, and dashboard in one command'
+    ],
+    impact: 'The system is designed around the principle that missing fraud is more expensive than investigating false alerts. By optimizing for Recall and F2-score instead of accuracy, the model catches 98.1% of fraud while remaining operationally usable for analysts. The SENTRY dashboard provides a complete fraud operations interface — from live transaction monitoring to case management — bridging the gap between ML model performance and real analyst workflows.',
+    visuals: [
+      { src: 'assets/images/fraud-detection/threshold-analysis.png', alt: 'Threshold Analysis', caption: 'F2-score sweep from 0.05 to 0.95 — optimal threshold selected at 0.14.' },
+      { src: 'assets/images/fraud-detection/confusion-matrix.png', alt: 'Confusion Matrix', caption: 'At threshold 0.14: 207 fraud caught, only 4 missed out of 211 actual cases.' },
+      { src: 'assets/images/fraud-detection/sentry-dashboard.png', alt: 'SENTRY Dashboard', caption: 'React analyst dashboard with live feed, case queue, and model monitoring.' },
+      { src: 'assets/images/fraud-detection/pr-curve.png', alt: 'PR Curve — RF vs LR', caption: 'Random Forest PR-AUC significantly outperforms Logistic Regression.' }
+    ]
+  },
   'retail-performance-dashboard': {
     title: 'Retail Performance Dashboard', category: 'Business Intelligence',
     description: 'Analyzed $1.57M in retail revenue across 3K orders using SQL and Power BI — uncovering Technology dominates profitability at 19% margin while Furniture poses critical operational risk at 2% margin.',
@@ -577,6 +634,14 @@ function ProjectDetailPage({ projectId, onNavigate }) {
                 <Icon.Github size={13} /> GitHub
               </a>
             }
+            {p.demoVideoLink &&
+              <a href={p.demoVideoLink} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 16px', borderRadius: 8, fontSize: 12.5, fontWeight: 600, background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.25)', textDecoration: 'none', transition: 'all 0.2s' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.18)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; }}>
+                ▶ Demo Video
+              </a>
+            }
+            {p.flagship && <span style={{ padding: '4px 12px', borderRadius: 99, fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', background: p.color, color: '#080808' }}>Flagship</span>}
           </div>
         </div>
       </div>
@@ -595,10 +660,23 @@ function ProjectDetailPage({ projectId, onNavigate }) {
         </div>
       </div>
 
-      {/* Main image */}
+      {/* Main image or placeholder */}
       <div style={{ padding: `${sectionPad} ${px}` }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', borderRadius: 16, overflow: 'hidden', border: `1px solid ${p.color}20`, boxShadow: `0 24px 80px rgba(0,0,0,0.6), 0 0 60px ${p.color}10`, cursor: 'zoom-in' }} onClick={() => setLb(p.image)}>
-          <img src={p.image} alt={p.title} style={{ width: '100%', display: 'block' }} />
+        <div style={{ maxWidth: 900, margin: '0 auto', borderRadius: 16, overflow: 'hidden', border: `1px solid ${p.color}20`, boxShadow: `0 24px 80px rgba(0,0,0,0.6), 0 0 60px ${p.color}10`, cursor: p.image ? 'zoom-in' : 'default' }} onClick={() => p.image && setLb(p.image)}>
+          {p.image
+            ? <img src={p.image} alt={p.title} style={{ width: '100%', display: 'block' }} />
+            : <div style={{ height: 280, background: `linear-gradient(135deg, ${p.color}12 0%, #0d0d0d 100%)`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+                <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {p.kpis.slice(0, 3).map(k => (
+                    <div key={k.label} style={{ textAlign: 'center', padding: '16px 24px', borderRadius: 14, border: `1px solid ${p.color}25`, background: `${p.color}08` }}>
+                      <div className="syne" style={{ fontSize: 32, fontWeight: 900, color: p.color, letterSpacing: '-0.04em', lineHeight: 1 }}>{k.value}</div>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(242,240,235,0.3)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 6 }}>{k.label}</div>
+                    </div>
+                  ))}
+                </div>
+                <p style={{ fontSize: 12, color: 'rgba(242,240,235,0.2)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Screenshot coming soon — add to assets/images/fraud-detection/</p>
+              </div>
+          }
         </div>
       </div>
 
@@ -622,6 +700,62 @@ function ProjectDetailPage({ projectId, onNavigate }) {
           </div>
         </div>
       )}
+
+      {/* Architecture */}
+      {p.architecture &&
+        <div style={{ padding: `${sectionPad} ${px}`, borderTop: '1px solid rgba(255,255,255,0.05)', background: '#0c0c0c' }}>
+          <div style={{ maxWidth: 900, margin: '0 auto' }}>
+            <AnimateIn>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 11, background: p.color + '15', color: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon.Layers size={18} />
+                </div>
+                <h2 className="syne" style={{ fontSize: 'clamp(18px,3vw,28px)', fontWeight: 800, letterSpacing: '-0.03em', color: '#f2f0eb' }}>System Architecture</h2>
+              </div>
+              <div style={{ padding: '20px 24px', borderRadius: 12, background: '#0a0a0a', border: `1px solid ${p.color}20`, marginBottom: 16, overflowX: 'auto' }}>
+                <div className="syne" style={{ fontSize: isMobile ? 12 : 13.5, color: p.color, letterSpacing: '0.04em', lineHeight: 2, whiteSpace: 'pre-wrap', opacity: 0.85 }}>
+                  {p.architecture.replace(/→/g, ' →\n  ')}
+                </div>
+              </div>
+            </AnimateIn>
+          </div>
+        </div>
+      }
+
+      {/* Dashboard Features */}
+      {p.dashboardFeatures &&
+        <div style={{ padding: `${sectionPad} ${px}`, borderTop: '1px solid rgba(255,255,255,0.05)', background: '#080808' }}>
+          <div style={{ maxWidth: 900, margin: '0 auto' }}>
+            <AnimateIn>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 11, background: p.color + '15', color: p.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon.Cpu size={18} />
+                </div>
+                <div>
+                  <h2 className="syne" style={{ fontSize: 'clamp(18px,3vw,28px)', fontWeight: 800, letterSpacing: '-0.03em', color: '#f2f0eb', lineHeight: 1 }}>SENTRY Dashboard</h2>
+                  <p style={{ fontSize: 13, color: 'rgba(242,240,235,0.3)', marginTop: 4 }}>React analyst dashboard for real-time fraud operations</p>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: 10 }}>
+                {p.dashboardFeatures.map((f, i) => {
+                  const parts = f.split(' — ');
+                  return (
+                    <div key={i} style={{ display: 'flex', gap: 12, padding: '14px 16px', borderRadius: 10, background: '#111', border: '1px solid rgba(255,255,255,0.06)', transition: 'border-color 0.2s' }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor = p.color + '35'}
+                      onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'}>
+                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: p.color, flexShrink: 0, marginTop: 5 }} />
+                      <div>
+                        <span className="syne" style={{ fontSize: 13, fontWeight: 700, color: '#f2f0eb' }}>{parts[0]}</span>
+                        {parts[1] && <span style={{ fontSize: 13, color: 'rgba(242,240,235,0.35)' }}> — {parts[1]}</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </AnimateIn>
+          </div>
+        </div>
+      }
 
       {/* Results */}
       <div style={{ padding: `${sectionPad} ${px}`, borderTop: '1px solid rgba(255,255,255,0.05)', background: '#0c0c0c' }}>
